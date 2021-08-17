@@ -7,6 +7,8 @@ controller:
         type: LoadBalancer
         externalTrafficPolicy: Local
         omitClusterIP: true
+        annotations:
+            service.beta.kubernetes.io/azure-load-balancer-internal: "true"        
     publishService: 
         enabled: true
     stats:
