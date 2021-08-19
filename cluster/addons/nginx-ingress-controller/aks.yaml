@@ -5,7 +5,8 @@ controller:
     replicaCount: 1
     service:
         type: LoadBalancer
-        externalTrafficPolicy: Local
+#       externalTrafficPolicy: Local
+        externalTrafficPolicy: Cluster
         omitClusterIP: true
     publishService: 
         enabled: true
