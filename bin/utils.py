@@ -37,15 +37,27 @@ DOCKER_REGEX_NAME = {
 REQ_VERSIONS ={
     'ds-operator': {
         'MIN': 'v0.1.0',
-        'MAX': 'v100',
+        'MAX': 'v100.0.0',
     },
     'secret-agent': {
         'MIN': 'v1.1.1',
-        'MAX': 'v100',
+        'MAX': 'v100.0.0',
     },
     'minikube': {
         'MIN': 'v1.22.0',
-        'MAX': 'v100',
+        'MAX': 'v100.0.0',
+    },
+    'kubectl': {
+        'MIN': 'v1.20.0',
+        'MAX': 'v100.0.0',
+    },
+    'kustomize': {
+        'MIN': 'v4.2.0',
+        'MAX': 'v100.0.0',
+    },
+    'skaffold':{
+        'MIN': 'v1.20.0',
+        'MAX': 'v100.0.0',        
     }
 }
 
@@ -196,31 +208,23 @@ def wait_for_ds(ns, directoryservices_name):
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
 
 
-def getsec(ns, secret, secretKey):
-    """Get secret contents"""
-    _, pipe, _ = run('kubectl',
-                     f'-n {ns} get secret {secret} -o jsonpath={{.data.{secretKey}}}', cstdout=True)
-    _, pipe, _ = run('base64', '--decode', cstdout=True, stdin=pipe)
-    return pipe.decode('ascii')
-
-
 def printsecrets(ns):
     """Print relevant platform secrets"""
     message('\nRelevant passwords:')
     try:
         print(
-            f"{getsec(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
+            f"{get_secret_value(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
         print(
-            f"{getsec(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
+            f"{get_secret_value(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
         print(
-            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
+            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
         print(
-            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
-        print("{} (uid=admin user)".format(getsec(ns, 'ds-passwords',
-              'dirmanager\\.pw')))  # f'strings' do not allow '\'
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
+            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
+        print("{} (uid=admin user)".format(get_secret_value(ns, 'ds-passwords',
+              'dirmanager\\\.pw')))  # f'strings' do not allow '\'
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
     except Exception as _e:
         sys.exit(1)
 
@@ -244,11 +248,27 @@ def check_component_version(component, version):
     version_min = pkg_resources.parse_version(REQ_VERSIONS[component]['MIN'])
     if not version_min <= version <= version_max:
         error(f'Unsupported {component} version found: "{version}"')
-        message(f'Need {component} versions: {version_min} <= X <= {version_max}')
+        message(f'Need {component} versions between {version_min} and {version_max}')
         sys.exit(1)
+
+def check_base_toolset():
+    # print('Checking kubectl version')
+    _, ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
+    ver = ver.decode('ascii').split(' ')[-1].strip()
+    check_component_version('kubectl', ver)
+    
+    # print('Checking kustomize version')
+    _, ver, _ = run('kustomize', 'version --short', cstdout=True)
+    ver = ver.decode('ascii').split()[0].split('/')[-1]
+    check_component_version('kustomize', ver)
+
+    # print('Checking skaffold version')
+    _, ver, _ = run('skaffold', 'version', cstdout=True)
+    check_component_version('skaffold', ver.decode('ascii').strip())
 
 def install_dependencies():
     """Check and install dependencies"""
+    check_base_toolset()
     print('Checking secret-agent operator and related CRDs:', end=' ')
     try:
         run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
@@ -542,25 +562,95 @@ def get_context():
     return ctx.decode('ascii') if ctx else 'default'
 
 # Lookup the value of a configmap key
-def get_configmap_value(namespace, configmap, key):
-    ks = "{.data." + key + "}"
-    r = subprocess.run(
-        f'kubectl --namespace {namespace} get configmap {configmap} -o jsonpath={ks}', shell=True, capture_output=True)
-    if r.returncode != 0:
-        print(f'Kubectl error {r.stderr} : {r.stdout}')
-        sys.exit(1)
-    return r.stdout.decode("utf-8")
-
+def get_configmap_value(ns, configmap, key):
+    """Get configmap contents"""
+    _, value, _ = run('kubectl',
+                     f'-n {ns} get configmap {configmap} -o jsonpath={{.data.{key}}}', cstdout=True)
+    return value.decode('utf-8')
 
 # Lookup the value of a secret
-def get_secret_value(namespace, secret, key):
-    ks = "{.data." + key + "}"
-    r = subprocess.run(
-        f'kubectl --namespace {namespace} get secret {secret} -o jsonpath={ks}', shell=True, capture_output=True)
-    if r.returncode != 0:
-        print(f'Kubectl error {r.stderr} : {r.stdout}')
-        sys.exit(1)
+def get_secret_value(ns, secret, key):
+    """Get secret contents"""
+    _, value, _ = run('kubectl',
+                     f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
+    return base64.b64decode(value).decode('utf-8')
 
-        # base64 decode the secret
-    secret = base64.b64decode(r.stdout.decode("utf-8"))
-    return secret
+def amster_import(ns, src, printlogs=True):
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_upload_job_path = os.path.join(kustomize_dir, 'base', 'amster-upload')
+    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    # If the source dir/file does not exist exit
+    if not os.path.exists(src):
+        error(f'Cant read path {src}. Please specify a valid path and try again')
+        sys.exit(1)
+    try:
+        clean_amster_job(ns)
+        message('Packing and uploading configs')
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
+        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz')
+        pod = _launch_amster_job(amster_upload_job_path, ns)
+        message('\nWaiting for amster job to complete. This can take several minutes.')
+        run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+        if printlogs:
+            message('Captured logs from the amster pod')
+            run('kubectl', f'-n {ns} logs -c amster {pod}')
+    finally:
+        clean_amster_job(ns)
+
+def amster_export(ns, dst, glob):
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
+    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    if not os.path.isdir(dst):
+        error(f'{dst} is not a valid directory. Please specify a valid path and try again')
+        sys.exit(1)
+    try:
+        clean_amster_job(ns)
+        message('Packing and uploading configs')
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-scripts.tar.gz')
+        # Create export - amster will export data, and wait.
+        pod = _launch_amster_job(amster_export_job_path, ns)
+        message('\nWaiting for amster job to complete. This can take several minutes.')
+        run('kubectl', f'-n {ns} wait --for=condition=ready pod {pod} --timeout=600s')
+
+        # If args.glob is True, copy the realm AND global data
+        if glob:
+            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster {dst}')
+        else:
+            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster/realms {dst}/realms')
+
+        if not os.listdir(dst):
+            error('No files were exported!')
+            sys.exit(1)
+    finally:
+        clean_amster_job(ns)
+
+# Launch an amster job specified. Provide the path to the kustomize for the amster job. Returns the pod name.
+def _launch_amster_job(kustomize_path, ns):
+    message('Deploying amster')
+    _, contents, _ = run('kustomize', f'build {kustomize_path}', cstdout=True)
+    contents = contents.decode('ascii')
+    contents = contents.replace('namespace: default', f'namespace: {ns}')
+    run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+    time.sleep(5) # Allow kube-scheduler to create the pod
+    _, amster_pod_name, _ = run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=amster -o jsonpath={{.items[0].metadata.name}}',
+                                      cstdout=True)
+    return amster_pod_name.decode('ascii')
+
+def clean_amster_job(ns):
+    message(f'Cleaning up amster components')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
+    if os.path.exists('amster-import.tar.gz'): 
+        os.remove('amster-import.tar.gz')
+    if os.path.exists('amster-scripts.tar.gz'): 
+        os.remove('amster-scripts.tar.gz')
+    return
