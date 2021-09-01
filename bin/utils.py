@@ -14,6 +14,7 @@ import logging
 import json
 import re
 import pkg_resources
+from pathlib import Path
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -24,6 +25,8 @@ MSG_FMT = '[%(levelname)s] %(message)s'
 _IGNORE_FILES = ('.DS_Store',)
 
 log_name = 'foregops'
+
+ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
 
 DOCKER_REGEX_NAME = {
     'am': '.*am',
@@ -59,6 +62,40 @@ REQ_VERSIONS ={
         'MIN': 'v1.20.0',
         'MAX': 'v100.0.0',        
     }
+}
+
+def inject_kustomize_amster(kustomize_pkg_path): return _inject_kustomize_amster(kustomize_pkg_path)
+
+size_paths = {
+    'mini': 'overlay/mini',
+    'small': 'overlay/small',
+    'medium': 'overlay/medium',
+    'large': 'overlay/large',
+    'cdk': 'base'
+}
+
+bundles = {
+    'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
+	'base-cdm': ['base/kustomizeConfig', 'base/ingress', 'dev/scripts'],
+    'ds': ['base/ds-idrepo'],
+    'ds-cdm': ['base/ds-idrepo', 'base/ds-cts'],
+    'ds-old': ['base/ds/idrepo', 'base/ds/cts'],
+    'apps': ['base/am-cdk', 'base/idm-cdk', 'base/rcs-agent', inject_kustomize_amster],
+    'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
+    'am': ['base/am-cdk'],
+    'idm': ['base/idm-cdk'],
+    'amster': [inject_kustomize_amster]
+}
+
+patcheable_components ={
+    'base/am-cdk': 'am.yaml',
+    'base/idm-cdk': 'idm.yaml',
+    'base/kustomizeConfig': 'base.yaml',
+    'base/ds/idrepo': 'ds-idrepo-old.yaml',
+    'base/ds/cts': 'ds-cts-old.yaml',
+    'base/ds-idrepo': 'ds-idrepo.yaml',
+    'base/ds-cts': 'ds-cts.yaml',
+    'base/ig': 'ig.yaml',
 }
 
 SCRIPT = pathlib.Path(__file__)
@@ -191,7 +228,6 @@ def _runwithtimeout(target, args, secs):
         print(f'{target} timed out after {secs} secs')
         sys.exit(1)
 
-
 def waitforsecrets(ns):
     """Wait for the given secrets to exist in the Kubernetes api."""
     secrets = ['am-env-secrets', 'idm-env-secrets',
@@ -207,38 +243,155 @@ def wait_for_ds(ns, directoryservices_name):
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
 
+def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
+    """Generate Kustomize package for component or bundle"""
+    # Clean out the temp kustomize files
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    src_profile_dir = os.path.join(kustomize_dir, size_paths[size])
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    profile_dir = custom_path or os.path.join(kustomize_dir, 'deploy', component)
+    shutil.rmtree(profile_dir, ignore_errors=True)
+    Path(profile_dir).mkdir(parents=True, exist_ok=True)
+    run('kustomize', f'create', cwd=profile_dir)
+    run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}', 
+              cwd=profile_dir)
+    components_to_install = bundles.get(component, [f'base/{component}'])
+    # Temporarily add the wanted kustomize files
+    for c in components_to_install:
+        if callable(c):
+            c(profile_dir)
+        else:
+            run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
+        if c in patcheable_components and size != 'cdk':
+            p = patcheable_components[c]
+            shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
+            run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
 
-def printsecrets(ns):
-    """Print relevant platform secrets"""
-    message('\nRelevant passwords:')
+    fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
+    # run('kustomize', f'edit set namespace {ns}', cwd=profile_dir)
+    if component in ['base', 'base-cdm']:
+        run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
+            cwd=profile_dir) 
+    _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
+    contents = contents.decode('ascii')
+    contents = contents.replace('namespace: default', f'namespace: {ns}')
+    contents = contents.replace('namespace: prod', f'namespace: {ns}')
+    if ctx.lower() == 'minikube':
+        contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
+    return profile_dir, contents
+
+def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None):
+    """Generate and deploy component or bundle"""
+    pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
+    custom_path = os.path.join(pkg_base_path, component)
+    _, contents = generate_package(component, size, ns, fqdn, ctx, custom_path=custom_path)
+    run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+
+def uninstall_component(component, ns, force):
+    """Uninstall a profile"""
+    if  component == "all":
+        for c in ['ui', 'apps', 'ds', 'base']:
+            uninstall_component(c, ns, force)
+        return
     try:
-        print(
-            f"{get_secret_value(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
-        print(
-            f"{get_secret_value(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
-        print(
-            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
-        print(
-            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
-        print("{} (uid=admin user)".format(get_secret_value(ns, 'ds-passwords',
-              'dirmanager\\\.pw')))  # f'strings' do not allow '\'
-        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
-        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
-        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
+        # generate a manifest with the components to be uninstalled in a temp location
+        kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+        uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
+        _, contents = generate_package(component, 'cdk', ns, '.', '', custom_path=uninstall_dir)
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
+        if component == 'base' and force:
+            run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
+            run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
+            uninstall_component('secrets', ns, False)
+    except Exception as e:
+        print(f'Could not delete {component}. Got: {e}')
+        sys.exit(1)  # Hide python traceback.
+    finally:
+        #clean up temp folder
+        shutil.rmtree(uninstall_dir, ignore_errors=True)
+
+def _inject_kustomize_amster(kustomize_pkg_path):
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_cm_name = 'amster-files.yaml'
+    amster_cm_path = os.path.join(kustomize_pkg_path, amster_cm_name)
+    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', 'cdk')
+    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    try:
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        run('tar', f'-czf amster-import.tar.gz -C {amster_config_path} .', cstdout=True, env=envVars)
+        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        _, cm, _ = run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
+                             cstdout=True)
+        with open(amster_cm_path, 'wt') as f:
+            f.write(cm.decode('ascii'))
+        run('kustomize', f'edit add resource ../../../kustomize/base/amster-upload', cwd=kustomize_pkg_path)
+        run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_pkg_path)
+    finally:
+        if os.path.exists('amster-import.tar.gz'): 
+            os.remove('amster-import.tar.gz')
+        if os.path.exists('amster-scripts.tar.gz'): 
+            os.remove('amster-scripts.tar.gz')
+
+def printsecrets(ns, to_stdout=True):
+    """Print relevant platform secrets"""
+    try:
+        secrets = {
+            'am-env-secrets': {
+                'AM_PASSWORDS_AMADMIN_CLEAR': None 
+            },
+            'idm-env-secrets': {
+                'OPENIDM_ADMIN_PASSWORD': None
+            },
+            'rcs-agent-env-secrets':{
+                'AGENT_IDM_SECRET': None,
+                'AGENT_RCS_SECRET': None,
+            },
+            'ds-passwords': {
+                'dirmanager\\\.pw': None,
+            },
+            'ds-env-secrets': {
+                'AM_STORES_APPLICATION_PASSWORD': None,
+                'AM_STORES_CTS_PASSWORD': None,
+                'AM_STORES_USER_PASSWORD': None,
+            },
+        }
+        for secret in secrets:
+            for key in secrets[secret]:
+                secrets[secret][key] = get_secret_value(ns, secret, key)
+        if to_stdout:
+            message('\nRelevant passwords:')
+            print(
+                f"{secrets['am-env-secrets']['AM_PASSWORDS_AMADMIN_CLEAR']} (amadmin user)")
+            print(
+                f"{secrets['idm-env-secrets']['OPENIDM_ADMIN_PASSWORD']} (openidm-admin user)")
+            print(
+                f"{secrets['rcs-agent-env-secrets']['AGENT_IDM_SECRET']} (rcs-agent IDM secret)")
+            print(
+                f"{secrets['rcs-agent-env-secrets']['AGENT_RCS_SECRET']} (rcs-agent RCS secret)")
+            print("{} (uid=admin user)".format(secrets['ds-passwords']['dirmanager\\\.pw']))  # f'strings' do not allow '\'
+            print(f"{secrets['ds-env-secrets']['AM_STORES_APPLICATION_PASSWORD']} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
+            print(f"{secrets['ds-env-secrets']['AM_STORES_CTS_PASSWORD']} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
+            print(f"{secrets['ds-env-secrets']['AM_STORES_USER_PASSWORD']} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
+        return secrets
     except Exception as _e:
         sys.exit(1)
 
 
-def printurls(ns):
+def printurls(ns, to_stdout=True):
     """Print relevant platform URLs"""
-    message('\nRelevant URLs:')
-    _, fqdn, _ = run(
-        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
-    fqdn = fqdn.decode('ascii')
-    warning(f'https://{fqdn}/platform')
-    warning(f'https://{fqdn}/admin')
-    warning(f'https://{fqdn}/am')
-    warning(f'https://{fqdn}/enduser')
+    fqdn = get_fqdn(ns)
+    urls = {
+        'platform': f'https://{fqdn}/platform',
+        'idm': f'https://{fqdn}/admin',
+        'am': f'https://{fqdn}/am',
+        'enduser': f'https://{fqdn}/enduser',
+    }
+    if to_stdout:
+        message('\nRelevant URLs:')
+        for url in urls:
+            print(urls[url])
+    return urls
 
 
 def check_component_version(component, version):
@@ -417,87 +570,6 @@ def configure_platform_images(clone_path,
         log.error(f'Couldn\t configure repo {e}')
         raise e
 
-
-_USER_PWD_EXPR_RULES = {
-    'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
-    'idm-resource-server.json': '&{idm.rs.client.secret|password}',
-    'resource-server.json': '&{ig.rs.client.secret|password}',
-    'oauth2.json': '&{pit.client.secret|password}',
-    'ig-agent.json': '&{ig.agent.password|password}',
-}
-ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
-
-
-def _convert_path_to_common_exp(path):
-    """
-    This changes:
-      docker/amster/foo/conf/realms/root-philA/OAuth2Clients/b.json
-      realms.rootphilA.oauth2clients.b.userpassword
-    """
-    path_parts = path.parent.parts
-    start = path_parts.index('config')
-    dotted_path = '.'.join(path_parts[start + 1:])
-    safe_path = ALLOWED_COMMONS_CHARS.sub('', dotted_path)
-    safe_name = ALLOWED_COMMONS_CHARS.sub('', path.stem)
-    return f'&{{{safe_path}.{safe_name}.userpassword}}'
-
-
-def upgrade_amster_conf(conf, conf_file_name, fqdn):
-    """
-    Recursively search objects looking at values and keys that need
-    to be updated.
-    """
-    log = logging.getLogger('forgeops')
-    # Go through all items in a list
-    if isinstance(conf, list):
-        for i in conf:
-            conf = upgrade_amster_conf(i, conf_file_name, fqdn)
-        return conf
-    # This is str, int, bool, float and nulls we don't do anything with these
-    # types.
-    elif not isinstance(conf, dict):
-        return conf
-
-    # use copy to iterate through so we can modify keys.
-    for k, v in conf.copy().items():
-        if isinstance(v, dict):
-            conf[k] = upgrade_amster_conf(v, conf_file_name, fqdn)
-            continue
-        elif isinstance(v, list):
-            new_value = []
-            for i in v:
-                new_value.append(upgrade_amster_conf(v, conf_file_name, fqdn))
-            conf[k] = new_value
-            continue
-        # Update FQDN
-        try:
-            if fqdn in v:
-                log.debug('Found a fqdn entry, updating.')
-                conf[k] = v.replace(fqdn(), '&{fqdn}')
-        except TypeError:
-            # this happens if there's value of none.
-            pass
-        # Key based updates
-        # userpassword, amsterVersion, userpassword-encrypted
-        if k == 'userpassword-encrypted':
-            conf.pop(k)
-        # TODO this has two external things that need to be ported...
-        elif k == 'userpassword':
-            try:
-                conf[k] = _USER_PWD_EXPR_RULES[conf_file_name.name]
-                # log.debug(f'Updated {conf_file_name.name}')
-            except KeyError:
-                log.info(
-                    (f'A userpassword key found in {conf_file_name} '
-                     'but no replacement rule was found, using default'))
-                conf[k] = _convert_path_to_common_exp(conf_file_name)
-                log.info(f'{conf_file_name} has password changed to {conf[k]}')
-        # update amster version
-        elif k == 'amsterVersion':
-            conf[k] = '&{version}'
-    return conf
-
-
 def sort_dir_json(base):
     """
     Recursively search a path for json files. Round-tripping to sort alpha
@@ -549,6 +621,10 @@ def copytree(src, dst):
 #     r = subprocess.run(args.split())
 #     return r.returncode
 
+def get_fqdn(ns):
+    _, fqdn, _ = run(
+        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
+    return fqdn.decode('ascii')
 
 # IF ns is not None, then return it, otherwise lookup the current namespace context
 def get_namespace(ns=None):
@@ -574,83 +650,3 @@ def get_secret_value(ns, secret, key):
     _, value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')
-
-def amster_import(ns, src, printlogs=True):
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    docker_dir = os.path.join(sys.path[0], '../docker')
-    amster_upload_job_path = os.path.join(kustomize_dir, 'base', 'amster-upload')
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
-    # If the source dir/file does not exist exit
-    if not os.path.exists(src):
-        error(f'Cant read path {src}. Please specify a valid path and try again')
-        sys.exit(1)
-    try:
-        clean_amster_job(ns)
-        message('Packing and uploading configs')
-        envVars = os.environ
-        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
-        run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
-        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
-        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz')
-        pod = _launch_amster_job(amster_upload_job_path, ns)
-        message('\nWaiting for amster job to complete. This can take several minutes.')
-        run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
-        if printlogs:
-            message('Captured logs from the amster pod')
-            run('kubectl', f'-n {ns} logs -c amster {pod}')
-    finally:
-        clean_amster_job(ns)
-
-def amster_export(ns, dst, glob):
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    docker_dir = os.path.join(sys.path[0], '../docker')
-    amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
-    if not os.path.isdir(dst):
-        error(f'{dst} is not a valid directory. Please specify a valid path and try again')
-        sys.exit(1)
-    try:
-        clean_amster_job(ns)
-        message('Packing and uploading configs')
-        envVars = os.environ
-        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
-        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
-        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-scripts.tar.gz')
-        # Create export - amster will export data, and wait.
-        pod = _launch_amster_job(amster_export_job_path, ns)
-        message('\nWaiting for amster job to complete. This can take several minutes.')
-        run('kubectl', f'-n {ns} wait --for=condition=ready pod {pod} --timeout=600s')
-
-        # If args.glob is True, copy the realm AND global data
-        if glob:
-            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster {dst}')
-        else:
-            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster/realms {dst}/realms')
-
-        if not os.listdir(dst):
-            error('No files were exported!')
-            sys.exit(1)
-    finally:
-        clean_amster_job(ns)
-
-# Launch an amster job specified. Provide the path to the kustomize for the amster job. Returns the pod name.
-def _launch_amster_job(kustomize_path, ns):
-    message('Deploying amster')
-    _, contents, _ = run('kustomize', f'build {kustomize_path}', cstdout=True)
-    contents = contents.decode('ascii')
-    contents = contents.replace('namespace: default', f'namespace: {ns}')
-    run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
-    time.sleep(5) # Allow kube-scheduler to create the pod
-    _, amster_pod_name, _ = run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=amster -o jsonpath={{.items[0].metadata.name}}',
-                                      cstdout=True)
-    return amster_pod_name.decode('ascii')
-
-def clean_amster_job(ns):
-    message(f'Cleaning up amster components')
-    run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
-    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
-    if os.path.exists('amster-import.tar.gz'): 
-        os.remove('amster-import.tar.gz')
-    if os.path.exists('amster-scripts.tar.gz'): 
-        os.remove('amster-scripts.tar.gz')
-    return

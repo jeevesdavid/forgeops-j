@@ -15,13 +15,13 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     def stageName = 'POSTCOMMIT-ALL-TESTS'
     def clusterConfig = [:]
     clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
-    clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.forgeops.com'
+    clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.engineeringpit.com'
+    def scaleClusterConfig = [:]
+    scaleClusterConfig['SCALE_CLUSTER'] = ['frontend-pool': 4, 'primary-pool': 6]
 
     try {
         node('forgeops-postcommit-cloud') {
-            cloud_utils.authenticateGcloud()
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'frontend-pool', 2)
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'primary-pool', 6)
+            cloud_utils.scaleClusterUp(clusterConfig + scaleClusterConfig)
         }
 
         def upgradeImageLevel = 'pit1'
@@ -217,7 +217,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                                 [TESTS_SCOPE: 'tests/k8s/postcommit/platform_ui',
                                  SKIP_TESTS                          : true,
                                  SKIP_CLEANUP                        : true,
-                                 CLUSTER_DOMAIN                      : 'postcommit-forgeops.engineeringpit.com',
                                  DEPLOYMENT_USE_LODESTAR_CERT        : true]
                         )
                     }
@@ -227,7 +226,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
             parallelTestsMap.put('Set Images',
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
-                                [TESTS_SCOPE: 'tests/set_images']
+                                [TESTS_SCOPE                    : 'tests/set_images',
+                                 STASH_PLATFORM_IMAGES_BRANCH   : 'postcommit-forgeops']
                         )
                     }
             )
@@ -243,9 +243,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
         }
 
         node('forgeops-postcommit-cloud') {
-            cloud_utils.authenticateGcloud()
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'frontend-pool', 0)
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'primary-pool', 0)
+            cloud_utils.scaleClusterDown(clusterConfig + scaleClusterConfig)
         }
     }
 }
