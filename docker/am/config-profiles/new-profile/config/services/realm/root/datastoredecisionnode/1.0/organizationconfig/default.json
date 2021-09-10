@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "DataStoreDecisionNode",
+      "collection": false,
+      "name": "DataStoreDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "DataStoreDecisionNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=DataStoreDecisionNode,ou=services,ou=am-config"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "EmailSuspendNode",
+      "collection": false,
+      "name": "EmailSuspendNode"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "EmailSuspendNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=EmailSuspendNode,ou=services,ou=am-config"
+  }
+}

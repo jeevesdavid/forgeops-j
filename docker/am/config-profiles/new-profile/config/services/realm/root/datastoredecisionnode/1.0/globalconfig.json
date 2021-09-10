@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "DataStoreDecisionNode",
+      "collection": false,
+      "name": "DataStoreDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "DataStoreDecisionNode",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=DataStoreDecisionNode,ou=services,ou=am-config"
+  }
+}

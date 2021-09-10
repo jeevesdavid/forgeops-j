@@ -1,0 +1,24 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "SocialIdentityProviders",
+      "collection": false,
+      "name": "SocialIdentityProviders"
+    },
+    "enabled": true
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "SocialIdentityProviders",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config"
+  }
+}

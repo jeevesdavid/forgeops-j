@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "QueryFilterDecisionNode",
+      "collection": false,
+      "name": "QueryFilterDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "QueryFilterDecisionNode",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=QueryFilterDecisionNode,ou=services,ou=am-config"
+  }
+}

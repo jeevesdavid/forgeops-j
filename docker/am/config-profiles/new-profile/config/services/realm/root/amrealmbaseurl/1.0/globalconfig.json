@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "amRealmBaseURL",
+      "collection": false,
+      "name": "amRealmBaseURL"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "amRealmBaseURL",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=amRealmBaseURL,ou=services,ou=am-config"
+  }
+}

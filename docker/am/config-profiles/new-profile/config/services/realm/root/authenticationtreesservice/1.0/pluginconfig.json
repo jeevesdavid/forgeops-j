@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "authenticationTreesService",
+      "collection": false,
+      "name": "authenticationTreesService"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "authenticationTreesService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config"
+  }
+}

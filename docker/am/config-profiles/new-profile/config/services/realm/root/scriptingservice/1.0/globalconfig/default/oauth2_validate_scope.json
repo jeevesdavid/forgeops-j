@@ -1,0 +1,25 @@
+{
+  "data": {
+    "_id": "default/OAUTH2_VALIDATE_SCOPE",
+    "_type": {
+      "_id": "ScriptingService",
+      "collection": false,
+      "name": "ScriptingService"
+    },
+    "defaultScript": "[Empty]",
+    "i18nKey": "script-type-09"
+  },
+  "metadata": {
+    "entityId": "default/OAUTH2_VALIDATE_SCOPE",
+    "entityType": "ScriptingService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": "scriptContext",
+    "uid": "ou=OAUTH2_VALIDATE_SCOPE,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config"
+  }
+}

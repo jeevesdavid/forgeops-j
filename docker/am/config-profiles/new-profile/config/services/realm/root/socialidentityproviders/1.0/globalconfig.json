@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "SocialIdentityProviders",
+      "collection": false,
+      "name": "SocialIdentityProviders"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "SocialIdentityProviders",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config"
+  }
+}

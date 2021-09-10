@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "CreateObjectNode",
+      "collection": false,
+      "name": "CreateObjectNode"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "CreateObjectNode",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=CreateObjectNode,ou=services,ou=am-config"
+  }
+}

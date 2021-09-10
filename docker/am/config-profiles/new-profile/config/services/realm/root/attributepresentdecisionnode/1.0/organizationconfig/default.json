@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "AttributePresentDecisionNode",
+      "collection": false,
+      "name": "AttributePresentDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "AttributePresentDecisionNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=AttributePresentDecisionNode,ou=services,ou=am-config"
+  }
+}

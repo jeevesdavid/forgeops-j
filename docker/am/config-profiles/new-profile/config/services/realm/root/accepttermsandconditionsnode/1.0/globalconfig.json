@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "AcceptTermsAndConditionsNode",
+      "collection": false,
+      "name": "AcceptTermsAndConditionsNode"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "AcceptTermsAndConditionsNode",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=AcceptTermsAndConditionsNode,ou=services,ou=am-config"
+  }
+}

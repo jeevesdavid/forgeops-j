@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "DataStoreDecisionNode",
+      "collection": false,
+      "name": "DataStoreDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "DataStoreDecisionNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=DataStoreDecisionNode,ou=services,ou=am-config"
+  }
+}

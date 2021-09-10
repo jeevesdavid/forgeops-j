@@ -1,0 +1,40 @@
+{
+  "data": {
+    "_id": "default/StdOut",
+    "_type": {
+      "_id": "AuditService",
+      "collection": false,
+      "name": "AuditService"
+    },
+    "commonHandler": {
+      "enabled": true,
+      "topics": [
+        "access",
+        "activity",
+        "config",
+        "authentication"
+      ]
+    },
+    "commonHandlerPlugin": {
+      "handlerFactory": "org.forgerock.openam.audit.events.handlers.JsonStdoutAuditEventHandlerFactory"
+    },
+    "jsonConfig": {
+      "elasticsearchCompatible": true
+    }
+  },
+  "metadata": {
+    "entityId": "default/StdOut",
+    "entityType": "AuditService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": [
+      "StdOut"
+    ],
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": "JSONStdout",
+    "uid": "ou=StdOut,ou=default,ou=GlobalConfig,ou=1.0,ou=AuditService,ou=services,ou=am-config"
+  }
+}

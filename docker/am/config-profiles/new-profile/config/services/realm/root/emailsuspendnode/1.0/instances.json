@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "Instances",
+    "_type": {
+      "_id": "EmailSuspendNode",
+      "collection": false,
+      "name": "EmailSuspendNode"
+    }
+  },
+  "metadata": {
+    "entityId": "Instances",
+    "entityType": "EmailSuspendNode",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=Instances,ou=1.0,ou=EmailSuspendNode,ou=services,ou=am-config"
+  }
+}

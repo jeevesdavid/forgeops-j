@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "Instances",
+    "_type": {
+      "_id": "QueryFilterDecisionNode",
+      "collection": false,
+      "name": "QueryFilterDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "Instances",
+    "entityType": "QueryFilterDecisionNode",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=Instances,ou=1.0,ou=QueryFilterDecisionNode,ou=services,ou=am-config"
+  }
+}

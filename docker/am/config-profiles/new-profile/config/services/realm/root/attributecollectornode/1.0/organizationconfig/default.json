@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "AttributeCollectorNode",
+      "collection": false,
+      "name": "AttributeCollectorNode"
+    }
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "AttributeCollectorNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=AttributeCollectorNode,ou=services,ou=am-config"
+  }
+}

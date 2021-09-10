@@ -1,0 +1,24 @@
+{
+  "data": {
+    "_id": "OrganizationConfig",
+    "_type": {
+      "_id": "AttributePresentDecisionNode",
+      "collection": false,
+      "name": "AttributePresentDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "OrganizationConfig",
+    "entityType": "AttributePresentDecisionNode",
+    "objectClass": [
+      "organizationalunit",
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=OrganizationConfig,ou=1.0,ou=AttributePresentDecisionNode,ou=services,ou=am-config"
+  }
+}

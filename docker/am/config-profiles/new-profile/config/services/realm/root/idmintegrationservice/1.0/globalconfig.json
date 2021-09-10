@@ -1,0 +1,24 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "IdmIntegrationService",
+      "collection": false,
+      "name": "IdmIntegrationService"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "IdmIntegrationService",
+    "objectClass": [
+      "top",
+      "organizationalunit",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=IdmIntegrationService,ou=services,ou=am-config"
+  }
+}

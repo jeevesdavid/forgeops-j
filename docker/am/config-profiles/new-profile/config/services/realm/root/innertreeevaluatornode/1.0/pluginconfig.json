@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "InnerTreeEvaluatorNode",
+      "collection": false,
+      "name": "InnerTreeEvaluatorNode"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "InnerTreeEvaluatorNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=InnerTreeEvaluatorNode,ou=services,ou=am-config"
+  }
+}

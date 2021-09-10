@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default/configuration",
+    "_type": {
+      "_id": "CorsService",
+      "collection": false,
+      "name": "CorsService"
+    }
+  },
+  "metadata": {
+    "entityId": "default/configuration",
+    "entityType": "CorsService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": "configuration",
+    "uid": "ou=configuration,ou=default,ou=GlobalConfig,ou=1.0,ou=CorsService,ou=services,ou=am-config"
+  }
+}

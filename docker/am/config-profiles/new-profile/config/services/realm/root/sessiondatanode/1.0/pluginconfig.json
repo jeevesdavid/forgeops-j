@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "SessionDataNode",
+      "collection": false,
+      "name": "SessionDataNode"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "SessionDataNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=SessionDataNode,ou=services,ou=am-config"
+  }
+}

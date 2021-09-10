@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "validationService",
+      "collection": false,
+      "name": "validationService"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "validationService",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=validationService,ou=services,ou=am-config"
+  }
+}

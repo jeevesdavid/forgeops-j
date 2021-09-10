@@ -1,0 +1,36 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "IdmIntegrationService",
+      "collection": false,
+      "name": "IdmIntegrationService"
+    },
+    "enabled": true,
+    "idmDeploymentPath": "openidm",
+    "idmDeploymentUrl": "http://idm",
+    "idmProvisioningClient": "idm-provisioning",
+    "jwtSigningCompatibilityMode": false,
+    "provisioningEncryptionAlgorithm": "RSAES_PKCS1_V1_5",
+    "provisioningEncryptionKeyAlias": "selfservice",
+    "provisioningEncryptionMethod": "A128CBC_HS256",
+    "provisioningSigningAlgorithm": "HS256",
+    "provisioningSigningKeyAlias": "openidm-selfservice-key"
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "IdmIntegrationService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent",
+      "organizationalunit"
+    ],
+    "ou": [
+      "default"
+    ],
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=default,ou=GlobalConfig,ou=1.0,ou=IdmIntegrationService,ou=services,dc=openam,dc=forgerock,dc=org"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "amRealmBaseURL",
+      "collection": false,
+      "name": "amRealmBaseURL"
+    },
+    "contextPath": "/am",
+    "extensionClassName": null,
+    "fixedValue": "&{am.server.protocol|https}://&{am.server.fqdn}",
+    "source": "FIXED_VALUE"
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "amRealmBaseURL",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": [
+      "default"
+    ],
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=amRealmBaseURL,ou=services,ou=am-config"
+  }
+}

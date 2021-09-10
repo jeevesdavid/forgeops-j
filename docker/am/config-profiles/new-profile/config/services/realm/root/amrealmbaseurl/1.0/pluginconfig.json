@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "amRealmBaseURL",
+      "collection": false,
+      "name": "amRealmBaseURL"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "amRealmBaseURL",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=amRealmBaseURL,ou=services,ou=am-config"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "data": {
+    "_id": "default/prometheusContainer/prometheus",
+    "_type": {
+      "_id": "iPlanetAMMonitoringService",
+      "collection": false,
+      "name": "iPlanetAMMonitoringService"
+    },
+    "authenticationType": "BASIC",
+    "enabled": true,
+    "password": "&{am.monitoring.prometheus.password.encrypted}",
+    "username": "prometheus"
+  },
+  "metadata": {
+    "entityId": "default/prometheusContainer/prometheus",
+    "entityType": "iPlanetAMMonitoringService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": [
+      "prometheus"
+    ],
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": "prometheus",
+    "uid": "ou=prometheus,ou=prometheusContainer,ou=default,ou=GlobalConfig,ou=1.0,ou=iPlanetAMMonitoringService,ou=services,ou=am-config"
+  }
+}

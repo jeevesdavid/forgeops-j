@@ -1,0 +1,92 @@
+{
+  "data": {
+    "Base64Validator": "org.forgerock.openam.sm.validation.Base64EncodedBinaryValidator",
+    "PositiveIntegerValidator": "org.forgerock.openam.audit.validation.PositiveIntegerValidator",
+    "_id": "defaultconfig",
+    "_type": {
+      "_id": "iPlanetAMAuthService",
+      "collection": false,
+      "name": "iPlanetAMAuthService"
+    },
+    "accountlockout": {
+      "invalidAttemptsDataAttributeName": null,
+      "lockoutAttributeName": null,
+      "lockoutAttributeValue": null,
+      "lockoutDuration": 0,
+      "lockoutDurationMultiplier": 1,
+      "lockoutEmailAddress": null,
+      "lockoutWarnUserCount": 0,
+      "loginFailureCount": 5,
+      "loginFailureDuration": 300,
+      "loginFailureLockoutMode": false,
+      "storeInvalidAttemptsInDataStore": true
+    },
+    "core": {
+      "adminAuthModule": null,
+      "orgConfig": null
+    },
+    "general": {
+      "defaultAuthLevel": 0,
+      "externalLoginPageUrl": null,
+      "identityType": [
+        "agent",
+        "user"
+      ],
+      "locale": "en_US",
+      "statelessSessionsEnabled": false,
+      "twoFactorRequired": false,
+      "userStatusCallbackPlugins": []
+    },
+    "iplanet-am-auth-allowed-modules": [],
+    "iplanet-am-auth-user-container": [
+      "ou=People"
+    ],
+    "iplanet-am-auth-user-naming-attr": "uid",
+    "postauthprocess": {
+      "loginFailureUrl": [],
+      "loginPostProcessClass": [],
+      "loginSuccessUrl": [
+        "/am/console"
+      ],
+      "userAttributeSessionMapping": [],
+      "usernameGeneratorClass": "com.sun.identity.authentication.spi.DefaultUserIDGenerator",
+      "usernameGeneratorEnabled": true
+    },
+    "security": {
+      "iplanet-am-auth-valid-goto-domains": [],
+      "keyAlias": "test",
+      "moduleBasedAuthEnabled": true,
+      "sharedSecret": "&{am.authentication.shared.secret}",
+      "zeroPageLoginAllowedWithoutReferrer": true,
+      "zeroPageLoginEnabled": false,
+      "zeroPageLoginReferrerWhiteList": []
+    },
+    "trees": {
+      "authenticationSessionsMaxDuration": 5,
+      "authenticationSessionsStateManagement": "JWT",
+      "authenticationSessionsWhitelist": false,
+      "suspendedAuthenticationTimeout": 5
+    },
+    "userprofile": {
+      "aliasAttributeName": [],
+      "defaultRole": [],
+      "dynamicProfileCreation": "false"
+    }
+  },
+  "metadata": {
+    "entityId": "defaultconfig",
+    "entityType": "iPlanetAMAuthService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent",
+      "organizationalunit"
+    ],
+    "ou": [
+      "defaultconfig"
+    ],
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMAuthService,ou=services,ou=am-config"
+  }
+}

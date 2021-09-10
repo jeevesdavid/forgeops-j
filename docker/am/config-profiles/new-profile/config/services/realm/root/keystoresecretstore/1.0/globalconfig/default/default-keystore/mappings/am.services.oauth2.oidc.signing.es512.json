@@ -1,0 +1,27 @@
+{
+  "data": {
+    "_id": "default/default-keystore/mappings/am.services.oauth2.oidc.signing.ES512",
+    "_type": {
+      "_id": "KeyStoreSecretStore",
+      "collection": false,
+      "name": "KeyStoreSecretStore"
+    },
+    "aliases": [
+      "es512test"
+    ],
+    "secretId": "am.services.oauth2.oidc.signing.ES512"
+  },
+  "metadata": {
+    "entityId": "default/default-keystore/mappings/am.services.oauth2.oidc.signing.ES512",
+    "entityType": "KeyStoreSecretStore",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": "instance",
+    "uid": "ou=am.services.oauth2.oidc.signing.ES512,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config"
+  }
+}

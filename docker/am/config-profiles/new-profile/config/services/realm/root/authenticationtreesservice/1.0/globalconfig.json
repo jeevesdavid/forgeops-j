@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "GlobalConfig",
+    "_type": {
+      "_id": "authenticationTreesService",
+      "collection": false,
+      "name": "authenticationTreesService"
+    }
+  },
+  "metadata": {
+    "entityId": "GlobalConfig",
+    "entityType": "authenticationTreesService",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": null,
+    "uid": "ou=GlobalConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config"
+  }
+}

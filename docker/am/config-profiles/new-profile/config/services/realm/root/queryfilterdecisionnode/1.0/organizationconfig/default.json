@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "QueryFilterDecisionNode",
+      "collection": false,
+      "name": "QueryFilterDecisionNode"
+    }
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "QueryFilterDecisionNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=QueryFilterDecisionNode,ou=services,ou=am-config"
+  }
+}

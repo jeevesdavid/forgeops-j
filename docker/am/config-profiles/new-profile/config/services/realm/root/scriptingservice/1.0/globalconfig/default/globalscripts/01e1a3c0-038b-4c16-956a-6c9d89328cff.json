@@ -1,0 +1,38 @@
+{
+  "data": {
+    "_id": "default/globalScripts/01e1a3c0-038b-4c16-956a-6c9d89328cff",
+    "_type": {
+      "_id": "ScriptingService",
+      "collection": false,
+      "name": "ScriptingService"
+    },
+    "context": "AUTHENTICATION_TREE_DECISION_NODE",
+    "createdBy": "null",
+    "creationDate": "0",
+    "description": "Default global script for a scripted decision node",
+    "language": "JAVASCRIPT",
+    "lastModifiedBy": "null",
+    "lastModifiedDate": "0",
+    "name": "Authentication Tree Decision Node Script",
+    "script": {
+      "$base64:encode": {
+        "$inline": "AuthenticationTreeDecisionNodeScript.javascript"
+      }
+    }
+  },
+  "metadata": {
+    "entityId": "default/globalScripts/01e1a3c0-038b-4c16-956a-6c9d89328cff",
+    "entityType": "ScriptingService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": [
+      "01e1a3c0-038b-4c16-956a-6c9d89328cff"
+    ],
+    "pathParams": {},
+    "realm": null,
+    "sunServiceID": "globalScript",
+    "uid": "ou=01e1a3c0-038b-4c16-956a-6c9d89328cff,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config"
+  }
+}

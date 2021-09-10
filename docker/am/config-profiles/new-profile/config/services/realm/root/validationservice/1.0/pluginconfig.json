@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "validationService",
+      "collection": false,
+      "name": "validationService"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "validationService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=validationService,ou=services,ou=am-config"
+  }
+}

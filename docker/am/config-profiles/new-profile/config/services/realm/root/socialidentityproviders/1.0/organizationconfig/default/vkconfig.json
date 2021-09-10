@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default/vkConfig",
+    "_type": {
+      "_id": "SocialIdentityProviders",
+      "collection": false,
+      "name": "SocialIdentityProviders"
+    }
+  },
+  "metadata": {
+    "entityId": "default/vkConfig",
+    "entityType": "SocialIdentityProviders",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": "vkConfig",
+    "uid": "ou=vkConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config"
+  }
+}

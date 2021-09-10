@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "IncrementLoginCountNode",
+      "collection": false,
+      "name": "IncrementLoginCountNode"
+    }
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "IncrementLoginCountNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=IncrementLoginCountNode,ou=services,ou=am-config"
+  }
+}

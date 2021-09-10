@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "PluginConfig",
+    "_type": {
+      "_id": "OAuth2Provider",
+      "collection": false,
+      "name": "OAuth2Provider"
+    }
+  },
+  "metadata": {
+    "entityId": "PluginConfig",
+    "entityType": "OAuth2Provider",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=PluginConfig,ou=1.0,ou=OAuth2Provider,ou=services,ou=am-config"
+  }
+}

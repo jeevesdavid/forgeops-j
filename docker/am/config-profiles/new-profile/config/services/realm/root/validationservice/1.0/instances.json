@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "Instances",
+    "_type": {
+      "_id": "validationService",
+      "collection": false,
+      "name": "validationService"
+    }
+  },
+  "metadata": {
+    "entityId": "Instances",
+    "entityType": "validationService",
+    "objectClass": [
+      "top",
+      "organizationalunit"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=Instances,ou=1.0,ou=validationService,ou=services,ou=am-config"
+  }
+}

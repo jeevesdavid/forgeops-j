@@ -1,0 +1,23 @@
+{
+  "data": {
+    "_id": "default",
+    "_type": {
+      "_id": "KbaCreateNode",
+      "collection": false,
+      "name": "KbaCreateNode"
+    }
+  },
+  "metadata": {
+    "entityId": "default",
+    "entityType": "KbaCreateNode",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "ou": null,
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=default,ou=OrganizationConfig,ou=1.0,ou=KbaCreateNode,ou=services,ou=am-config"
+  }
+}

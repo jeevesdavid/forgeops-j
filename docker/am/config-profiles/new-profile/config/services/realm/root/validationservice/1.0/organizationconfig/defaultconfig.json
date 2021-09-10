@@ -1,0 +1,29 @@
+{
+  "data": {
+    "_id": "defaultconfig",
+    "_type": {
+      "_id": "validationService",
+      "collection": false,
+      "name": "validationService"
+    },
+    "validGotoDestinations": [
+      "&{am.server.protocol|https}://&{fqdn}/*?*"
+    ]
+  },
+  "metadata": {
+    "entityId": "defaultconfig",
+    "entityType": "validationService",
+    "objectClass": [
+      "top",
+      "sunServiceComponent",
+      "organizationalunit"
+    ],
+    "ou": [
+      "defaultconfig"
+    ],
+    "pathParams": {},
+    "realm": "/",
+    "sunServiceID": null,
+    "uid": "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=validationService,ou=services,ou=am-config"
+  }
+}
