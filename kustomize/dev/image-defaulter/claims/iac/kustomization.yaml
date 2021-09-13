@@ -7,13 +7,13 @@ images:
   newName: gcr.io/forgeops-public/git-server
 - name: .*am
   newName: <<acr_name>>.azurecr.io/forgerock/am-base
-  newTag: dev
+  newTag: 7.1.0
 - name: .*amster.*
   newName: <<acr_name>>.azurecr.io/forgerock/amster
   newTag: 7.1.0
 - name: .*idm
   newName: gcr.io/forgeops-public/idm
-  newTag: 7.1.0
+  newTag: dev
 - name: .*ds-cts.*
   newName: gcr.io/forgeops-public/ds-cts
   newTag: dev
