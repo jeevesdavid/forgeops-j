@@ -6,10 +6,10 @@ images:
 - name: git-server
   newName: gcr.io/forgeops-public/git-server
 - name: .*am
-  newName: <<acr_name>>/forgerock/am-base
+  newName: <<acr_name>>.azurecr.io/forgerock/am-base
   newTag: dev
 - name: .*amster.*
-  newName: <<acr_name>>/forgerock/master
+  newName: <<acr_name>>.azurecr.io/forgerock/amster
   newTag: dev
 - name: .*idm
   newName: gcr.io/forgeops-public/idm
