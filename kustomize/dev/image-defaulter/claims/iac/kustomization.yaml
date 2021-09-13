@@ -10,10 +10,10 @@ images:
   newTag: dev
 - name: .*amster.*
   newName: <<acr_name>>.azurecr.io/forgerock/amster
-  newTag: dev
+  newTag: 7.1.0
 - name: .*idm
   newName: gcr.io/forgeops-public/idm
-  newTag: dev
+  newTag: 7.1.0
 - name: .*ds-cts.*
   newName: gcr.io/forgeops-public/ds-cts
   newTag: dev
