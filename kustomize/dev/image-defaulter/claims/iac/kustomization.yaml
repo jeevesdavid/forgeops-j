@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+commonLabels:
+  app.kubernetes.io/part-of: forgerock
+images:
+- name: git-server
+  newName: gcr.io/forgeops-public/git-server
+- name: .*am
+  newName: <<acr_name>>/forgerock/am-base
+  newTag: dev
+- name: .*amster.*
+  newName: <<acr_name>>/forgerock/master
+  newTag: dev
+- name: .*idm
+  newName: gcr.io/forgeops-public/idm
+  newTag: dev
+- name: .*ds-cts.*
+  newName: gcr.io/forgeops-public/ds-cts
+  newTag: dev
+- name: .*ds-idrepo.*
+  newName: gcr.io/forgeops-public/ds-idrepo
+  newTag: dev
+- name: .*ig.*
+  newName: gcr.io/forgeops-public/ig
+  newTag: dev
